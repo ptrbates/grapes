@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<h1>{{ title }}</h1>
+<table style="width:100%">
+    <tr>
+        <th>Course Title</th>
+        <th>Instructor</th>
+        <th>Duration (weeks)</th>
+        <th>Minutes/Week)</th>
+        <th>Total (w/multiplier)</th>
+        <th>Course Type</th>
+    </tr>
+    <tr>
+        <td><a href="{{ url_for('main.course_view', cid=course.id) }}">{{ course.title }}</a></td>
+        {% if course.teacher_id %}
+        <td><a href="{{ url_for('main.teacher_view', tid=course.teacher_id) }}">
+            {{ course.teacher.last_name }}, {{ course.teacher.first_name }}</a></td>
+        {% else %}
+        <td><a href="{{ url_for('main.course_view', cid=course.id) }}">Assign instructor</a></td>
+        {% endif %}
+        <td>{{ course.weeks }}</td>
+        <td>{{ course.min_per_week }}</td>
+        <td>{{ course.total_time() }}</td>
+        <td>{{ course.type }}</td>
+    </tr>
+</table>
+<br>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+<br>
+{% endblock %}

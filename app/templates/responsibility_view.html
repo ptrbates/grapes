@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<h1>{{ title }}</h1>
+<table style="width:100%">
+    <tr>
+        <th>Responsibility Name</th>
+        <th>Members</th>
+        <th>Hours per Month</th>
+        <th>Months per Year</th>
+        <th>Total Commitment</th>
+    </tr>
+    <tr>
+        <td><a href="{{ url_for('main.responsibility_view', rid=resp.id) }}">{{ resp.name }}</a></td>
+        <td>{% for member in resp.members %}
+            <a href="{{ url_for('main.teacher_view', tid=member.id) }}">{{ member.last_name }}, {{ member.first_name }}</a><br>
+            {% endfor %}
+        </td>
+        <td>{{ resp.hours_per_month }}</td>
+        <td>{{ resp.months_per_year }}</td>
+        <td>{{ resp.total_time() }}</td>
+    </tr>
+</table>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        {{ wtf.quick_form(form) }}
+    </div>
+</div>
+<br>
+{% endblock %}

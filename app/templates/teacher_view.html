@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<h1>{{ title }}</h1>
+<table style="width:100%">
+    <tr>
+        <th>Course Title</th>
+        <th>Duration (weeks)</th>
+        <th>Minutes/week</th>
+        <th>Total (w/multiplier)</th>
+        <th>Course Type</th>
+    </tr>
+    {% for course in courses %}
+    <tr>
+        <td><a href="{{ url_for('main.course_view', cid=course.id) }}">{{ course.title }}</a></td>
+        <td>{{ course.weeks }}</td>
+        <td>{{ course.min_per_week }}</td>
+        <td>{{ course.total_time() }}</td>
+        <td>{{ course.type }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td></td>
+        <td></td>
+        <td>Total Teaching:</td>
+        <td>{{ teacher.teaching_load() }}</td>
+        <td>({{ teacher.teaching_load_p() | round(0) }}%)</td>
+    </tr>
+        <tr>
+        <th>Responsibility Name</th>
+        <th>Hours per Month</th>
+        <th>Months per Year</th>
+        <th>Total Commitment</th>
+        <th></th>
+    </tr>
+    {% for resp in resps %}
+    <tr>
+        <td><a href="{{ url_for('main.responsibility_view', rid=resp.id) }}">{{ resp.name }}</a></td>
+        <td>{{ resp.hours_per_month }}</td>
+        <td>{{ resp.months_per_year }}</td>
+        <td>{{ resp.total_time() }}</td>
+        <td></td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td></td>
+        <td></td>
+        <td>Total Other:</td>
+        <td>{{ teacher.nt_load() }}</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>Total Load:</td>
+        <td>{{ teacher.total_load() }}</td>
+        <td>({{ teacher.total_load_p() | round(0) }}%)</td>
+    </tr>
+    <tr></tr>
+</table>
+<br>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endblock %}
