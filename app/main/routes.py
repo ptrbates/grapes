@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for
 from flask_login import login_required
 from app import db
 from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, ChooseViewForm, \
-    AssignCourseForm, ChangeCourseForm, AssignMemberForm, ChangeMultipliersForm
+    AssignCourseForm, ChangeCourseForm, ChangeTeacherForm, AssignMemberForm, ChangeMultipliersForm
 from app.models import Teacher, Course, Responsibility
 from app.main import bp
 
@@ -43,18 +43,40 @@ def teacher_view(tid):
     teacher = Teacher.query.filter_by(id=tid).first()
     title = 'Teacher View: {} {}'.format(teacher.first_name, teacher.last_name)
 
-    form = AssignCourseForm()
-    form.course_id.choices = [(c.id, c.title) for c in Course.query.order_by('title')]
-    if form.validate_on_submit():
-        course_id = form.course_id.data
+    form_a = AssignCourseForm()
+    form_a.course_id.choices = [(c.id, c.title) for c in Course.query.order_by('title')]
+    if form_a.validate_on_submit():
+        course_id = form_a.course_id.data
         course = Course.query.filter_by(id=course_id).first()
         course.teacher_id = teacher.id
         db.session.add(teacher)
         db.session.commit()
+        flash('Course assigned.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
+    form_c = ChangeTeacherForm()
+    form_c.first_name.data = teacher.first_name
+    form_c.last_name.data = teacher.last_name
+    form_c.grades.data = teacher.grades
+    form_c.hs.data = teacher.hs
+    if form_c.validate_on_submit():
+        if form_c.change.data:
+            teacher.first_name = form_c.first_name.data
+            teacher.last_name = form_c.last_name.data
+            teacher.grades = form_c.grades.data
+            teacher.hs = form_c.hs.data
+            db.session.add(teacher)
+            db.session.commit()
+            flash('Updates applied.')
+            return redirect(url_for('main.teacher_view', tid=teacher.id))
+        if form_c.delete.data:
+            db.session.delete(teacher)
+            db.session.commit()
+            flash('Teacher removed from database.')
+            return redirect(url_for('main.teacher_list'))
+
     return render_template('teacher_view.html', teacher=teacher, courses=teacher.courses,
-                           resps=teacher.responsibilities, title=title, form=form)
+                           resps=teacher.responsibilities, title=title, form_a=form_a, form_c=form_c)
 
 
 @bp.route('/course_list', methods=['GET', 'POST'])
@@ -71,10 +93,10 @@ def course_view(cid):
     course = Course.query.filter_by(id=cid).first()
     title = 'Course View: {}'.format(course.title)
     form = ChangeCourseForm()
-    form.title.default = course.title
-    form.type.default = course.type
-    form.weeks.default = course.weeks
-    form.min_per_week.default = course.min_per_week
+    form.title.data = course.title
+    form.type.data = course.type
+    form.weeks.data = course.weeks
+    form.min_per_week.data = course.min_per_week
     form.teacher_id.choices = [(t.id, t.last_name + ' ' + t.first_name) for t in Teacher.query.order_by('last_name')]
     if form.validate_on_submit():
         if form.assign.data:
@@ -85,10 +107,12 @@ def course_view(cid):
             course.teacher_id = form.teacher_id.data
             db.session.add(course)
             db.session.commit()
+            flash('Updates applied.')
             return redirect(url_for('main.course_list'))
         elif form.delete.data:
             db.session.delete(course)
             db.session.commit()
+            flash('Course removed from database.')
             return redirect(url_for('main.course_list'))
 
     return render_template('course_view.html', course=course, title=title, form=form)
@@ -179,13 +203,14 @@ def change_multipliers():
 
     return render_template('change_multipliers.html', title=title, form=form)
 
-multipliers = {'Grades Main Lesson': 20/20,
+
+multipliers = {'Grades Main Lesson': 20 / 20,
                'weeks/year': 35,
                'FT Expectation': 39000,
-               'Recess/Lunch': 20/20,
-               'Arts/Movement': 20/20,
-               'Foreign Language': 20/19,
-               'STEM': 20/18,
-               'Humanities/Chemistry': 20/16,
-               'Grades Specialty': 20/20,
+               'Recess/Lunch': 20 / 20,
+               'Arts/Movement': 20 / 20,
+               'Foreign Language': 20 / 19,
+               'STEM': 20 / 18,
+               'Humanities/Chemistry': 20 / 16,
+               'Grades Specialty': 20 / 20,
                'Other': 1}

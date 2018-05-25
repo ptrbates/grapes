@@ -14,14 +14,14 @@ class AddTeacherForm(FlaskForm):
 
 class AddCourseForm(FlaskForm):
     title = StringField('Course Title', validators=[DataRequired()])
-    type = SelectField('Course Type', choices=[('Grades Main Lesson', 'Grades Main Lesson'),
-                                               ('Recess/Lunch', 'Recess/Lunch'),
-                                               ('Arts/Movement', 'Arts/Movement'),
+    type = SelectField('Course Type', choices=[('Arts/Movement', 'Arts/Movement'),
                                                ('Foreign Language', 'Foreign Language'),
-                                               ('STEM', 'STEM'),
-                                               ('Humanities/Chemistry', 'Humanities/Chemistry'),
+                                               ('Grades Main Lesson', 'Grades Main Lesson'),
                                                ('Grades Specialty', 'Grades Specialty'),
-                                               ('Other', 'Other')],
+                                               ('Humanities/Chemistry', 'Humanities/Chemistry'),
+                                               ('Other', 'Other'),
+                                               ('Recess/Lunch', 'Recess/Lunch'),
+                                               ('STEM', 'STEM')],
                        validators=[DataRequired()])
     teacher_id = SelectField('Instructor', coerce=int)
     weeks = FloatField('Course Duration (weeks)', validators=[DataRequired()])
@@ -39,6 +39,15 @@ class AddResponsibilityForm(FlaskForm):
 class AssignCourseForm(FlaskForm):
     course_id = SelectField('Assign a new course:', coerce=int)
     assign = SubmitField('Assign Course')
+
+
+class ChangeTeacherForm(FlaskForm):
+    first_name = StringField('First name', validators=[DataRequired()])
+    last_name = StringField('Last name', validators=[DataRequired()])
+    grades = BooleanField('Teaches in the grades?')
+    hs = BooleanField('Teacher in the high school?')
+    change = SubmitField('Make Changes')
+    #delete = SubmitField('Delete Teacher')
 
 
 class ChangeCourseForm(FlaskForm):

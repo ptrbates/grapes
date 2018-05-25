@@ -27,7 +27,7 @@
         <td>{{ teacher.teaching_load() }}</td>
         <td>({{ teacher.teaching_load_p() | round(0) }}%)</td>
     </tr>
-        <tr>
+    <tr>
         <th>Responsibility Name</th>
         <th>Hours per Month</th>
         <th>Months per Year</th>
@@ -60,9 +60,20 @@
     <tr></tr>
 </table>
 <br>
+<div class="container">
     <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+        <div class="col-sm">
+            <div class="col-md-4">
+                <h2>Update Teacher:</h2>
+                {{ wtf.quick_form(form_c) }}
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="col-md-4">
+                <h2>Assign Course:</h2>
+                {{ wtf.quick_form(form_a) }}
+            </div>
         </div>
     </div>
+</div>
 {% endblock %}
