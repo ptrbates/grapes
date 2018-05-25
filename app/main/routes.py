@@ -93,7 +93,7 @@ def course_view(cid):
             form.populate_obj(course)
             db.session.commit()
             flash('Updates applied.')
-            return redirect(url_for('main.course_list'))
+            return redirect(url_for('main.course_view', cid=course.id))
         elif form.delete.data:
             db.session.delete(course)
             db.session.commit()
@@ -124,7 +124,7 @@ def responsibility_view(rid):
         resp.members.append(teacher)
         db.session.add(resp)
         db.session.commit()
-        return redirect(url_for('main.responsibility_list'))
+        return redirect(url_for('main.responsibility_view', rid=resp.id))
 
     form_c = ChangeResponsibilityForm(obj=resp)
     if form_c.validate_on_submit():
