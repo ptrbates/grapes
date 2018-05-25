@@ -36,11 +36,6 @@ class AddResponsibilityForm(FlaskForm):
     submit = SubmitField('Add Responsibility')
 
 
-class AssignCourseForm(FlaskForm):
-    course_id = SelectField('Assign a new course:', coerce=int)
-    assign = SubmitField('Assign Course')
-
-
 class ChangeTeacherForm(FlaskForm):
     first_name = StringField('First name', validators=[DataRequired()])
     last_name = StringField('Last name', validators=[DataRequired()])
@@ -74,6 +69,11 @@ class ChangeResponsibilityForm(FlaskForm):
     months_per_year = FloatField('Months per Year', validators=[DataRequired()])
     change = SubmitField('Update Responsibility')
     #delete = SubmitField('Delete Responsibility')
+
+
+class AssignCourseForm(FlaskForm):
+    course_id = SelectField('Assign a new course:', coerce=int)
+    assign = SubmitField('Assign Course')
 
 
 class AssignResponsibilityForm(FlaskForm):

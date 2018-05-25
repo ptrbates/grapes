@@ -55,18 +55,10 @@ def teacher_view(tid):
         flash('Course assigned.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
-    form_c = ChangeTeacherForm()
-    form_c.first_name.data = teacher.first_name
-    form_c.last_name.data = teacher.last_name
-    form_c.grades.data = teacher.grades
-    form_c.hs.data = teacher.hs
+    form_c = ChangeTeacherForm(obj=teacher)
     if form_c.validate_on_submit():
         if form_c.change.data:
-            teacher.first_name = form_c.first_name.data
-            teacher.last_name = form_c.last_name.data
-            teacher.grades = form_c.grades.data
-            teacher.hs = form_c.hs.data
-            db.session.add(teacher)
+            form_c.populate_obj(teacher)
             db.session.commit()
             flash('Updates applied.')
             return redirect(url_for('main.teacher_view', tid=teacher.id))
@@ -94,20 +86,11 @@ def course_view(cid):
     course = Course.query.filter_by(id=cid).first()
     title = 'Course View: {}'.format(course.title)
 
-    form = ChangeCourseForm()
-    form.title.data = course.title
-    form.type.data = course.type
-    form.weeks.data = course.weeks
-    form.min_per_week.data = course.min_per_week
-    form.teacher_id.choices = [(t.id, t.last_name + ' ' + t.first_name) for t in Teacher.query.order_by('last_name')]
+    form = ChangeCourseForm(obj=course)
+    form.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
     if form.validate_on_submit():
         if form.assign.data:
-            course.title = form.title.data
-            course.type = form.type.data
-            course.weeks = form.weeks.data
-            course.min_per_week = form.min_per_week.data
-            course.teacher_id = form.teacher_id.data
-            db.session.add(course)
+            form.populate_obj(course)
             db.session.commit()
             flash('Updates applied.')
             return redirect(url_for('main.course_list'))
@@ -135,7 +118,7 @@ def responsibility_view(rid):
     title = 'Responsibility View: {}'.format(resp.name)
 
     form_a = AssignMemberForm()
-    form_a.teacher_id.choices = [(t.id, t.last_name + ' ' + t.first_name) for t in Teacher.query.order_by('last_name')]
+    form_a.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
     if form_a.validate_on_submit():
         teacher = Teacher.query.filter_by(id=form_a.teacher_id.data).first()
         resp.members.append(teacher)
@@ -143,16 +126,10 @@ def responsibility_view(rid):
         db.session.commit()
         return redirect(url_for('main.responsibility_list'))
 
-    form_c = ChangeResponsibilityForm()
-    form_c.name.data = resp.name
-    form_c.months_per_year.data = resp.months_per_year
-    form_c.hours_per_month.data = resp.hours_per_month
+    form_c = ChangeResponsibilityForm(obj=resp)
     if form_c.validate_on_submit():
         if form_c.change.data:
-            resp.name = form_c.name.data
-            resp.hours_per_month = form_c.hours_per_month.data
-            resp.months_per_year = form_c.months_per_year.data
-            db.session.add(resp)
+            form_c.populate_obj(resp)
             db.session.commit()
             flash('Updates applied.')
             return redirect(url_for('main.responsibility_view', rid=resp.id))
