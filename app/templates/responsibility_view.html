@@ -23,9 +23,20 @@
     </tr>
 </table>
 <br>
-<div class="row">
-    <div class="col-md-4">
-        {{ wtf.quick_form(form) }}
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <div class="col-md-4">
+                <h2>Update Responsibility:</h2>
+                {{ wtf.quick_form(form_c) }}
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="col-md-4">
+                <h2>Assign Member:</h2>
+                {{ wtf.quick_form(form_a) }}
+            </div>
+        </div>
     </div>
 </div>
 <br>

@@ -68,6 +68,14 @@ class ChangeCourseForm(FlaskForm):
     delete = SubmitField('Delete Course')
 
 
+class ChangeResponsibilityForm(FlaskForm):
+    name = StringField('Name of Responsibility', validators=[DataRequired()])
+    hours_per_month = FloatField('Hours per Month', validators=[DataRequired()])
+    months_per_year = FloatField('Months per Year', validators=[DataRequired()])
+    change = SubmitField('Update Responsibility')
+    #delete = SubmitField('Delete Responsibility')
+
+
 class AssignResponsibilityForm(FlaskForm):
     resp_id = SelectField('Assign a new responsibility:')
     submit = SubmitField('Assign Responsibility')

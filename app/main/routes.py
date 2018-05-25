@@ -1,8 +1,9 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required
 from app import db
-from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, ChooseViewForm, \
-    AssignCourseForm, ChangeCourseForm, ChangeTeacherForm, AssignMemberForm, ChangeMultipliersForm
+from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
+    AssignCourseForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
+    ChangeMultipliersForm, ChooseViewForm
 from app.models import Teacher, Course, Responsibility
 from app.main import bp
 
@@ -92,6 +93,7 @@ def course_list():
 def course_view(cid):
     course = Course.query.filter_by(id=cid).first()
     title = 'Course View: {}'.format(course.title)
+
     form = ChangeCourseForm()
     form.title.data = course.title
     form.type.data = course.type
@@ -131,16 +133,36 @@ def responsibility_list():
 def responsibility_view(rid):
     resp = Responsibility.query.filter_by(id=rid).first()
     title = 'Responsibility View: {}'.format(resp.name)
-    form = AssignMemberForm()
-    form.teacher_id.choices = [(t.id, t.last_name + ' ' + t.first_name) for t in Teacher.query.order_by('last_name')]
-    if form.validate_on_submit():
-        teacher = Teacher.query.filter_by(id=form.teacher_id.data).first()
+
+    form_a = AssignMemberForm()
+    form_a.teacher_id.choices = [(t.id, t.last_name + ' ' + t.first_name) for t in Teacher.query.order_by('last_name')]
+    if form_a.validate_on_submit():
+        teacher = Teacher.query.filter_by(id=form_a.teacher_id.data).first()
         resp.members.append(teacher)
         db.session.add(resp)
         db.session.commit()
         return redirect(url_for('main.responsibility_list'))
 
-    return render_template('responsibility_view.html', resp=resp, title=title, form=form)
+    form_c = ChangeResponsibilityForm()
+    form_c.name.data = resp.name
+    form_c.months_per_year.data = resp.months_per_year
+    form_c.hours_per_month.data = resp.hours_per_month
+    if form_c.validate_on_submit():
+        if form_c.change.data:
+            resp.name = form_c.name.data
+            resp.hours_per_month = form_c.hours_per_month.data
+            resp.months_per_year = form_c.months_per_year.data
+            db.session.add(resp)
+            db.session.commit()
+            flash('Updates applied.')
+            return redirect(url_for('main.responsibility_view', rid=resp.id))
+        elif form_c.delete.data:
+            db.session.delete(resp)
+            db.session.commit()
+            flash('Responsibility removed from database.')
+            return redirect(url_for('main.responsibility_list'))
+
+    return render_template('responsibility_view.html', resp=resp, title=title, form_a=form_a, form_c=form_c)
 
 
 @bp.route('/adds', methods=['GET', 'POST'])
