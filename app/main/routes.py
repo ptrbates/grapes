@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for
 from flask_login import login_required
 from app import db
 from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
-    AssignCourseForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
+    AssignCourseForm, AssignResponsibilityForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
     ChangeMultipliersForm, ChooseViewForm
 from app.models import Teacher, Course, Responsibility
 from app.main import bp
@@ -49,10 +49,16 @@ def teacher_view(tid):
     if form_a.validate_on_submit():
         course_id = form_a.course_id.data
         course = Course.query.filter_by(id=course_id).first()
-        course.teacher_id = teacher.id
-        db.session.add(teacher)
-        db.session.commit()
-        flash('Course assigned.')
+        if form_a.assign.data:
+            course.teacher_id = teacher.id
+            db.session.add(teacher)
+            db.session.commit()
+            flash('Course assigned.')
+        elif form_a.remove.data:
+            course.teacher_id = None
+            db.session.add(course)
+            db.session.commit()
+            flash('Course removed.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
     form_c = ChangeTeacherForm(obj=teacher)
@@ -61,15 +67,32 @@ def teacher_view(tid):
             form_c.populate_obj(teacher)
             db.session.commit()
             flash('Updates applied.')
-            return redirect(url_for('main.teacher_view', tid=teacher.id))
         if form_c.delete.data:
+            for resp in teacher.responsibilities.all():
+                resp.members.remove(teacher)
+            db.session.commit()
             db.session.delete(teacher)
             db.session.commit()
             flash('Teacher removed from database.')
-            return redirect(url_for('main.teacher_list'))
+        return redirect(url_for('main.teacher_list'))
+
+    form_r = AssignResponsibilityForm(obj=teacher)
+    form_r.resp_id.choices = [(r.id, r.name) for r in Responsibility.query.order_by('name')]
+    if form_r.validate_on_submit():
+        resp_id = form_r.resp_id.data
+        resp = Responsibility.query.filter_by(id=resp_id).first()
+        if form_r.assign.data:
+            resp.members.append(teacher)
+            db.session.commit()
+            flash('Responsibility assigned.')
+        elif form_r.remove.data:
+            resp.members.remove(teacher)
+            db.session.commit()
+            flash('Responsibility removed.')
+        return redirect(url_for('main.teacher_view', tid=teacher.id))
 
     return render_template('teacher_view.html', teacher=teacher, courses=teacher.courses,
-                           resps=teacher.responsibilities, title=title, form_a=form_a, form_c=form_c)
+                           resps=teacher.responsibilities, title=title, form_a=form_a, form_c=form_c, form_r=form_r)
 
 
 @bp.route('/course_list', methods=['GET', 'POST'])
@@ -121,9 +144,16 @@ def responsibility_view(rid):
     form_a.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
     if form_a.validate_on_submit():
         teacher = Teacher.query.filter_by(id=form_a.teacher_id.data).first()
-        resp.members.append(teacher)
-        db.session.add(resp)
-        db.session.commit()
+        if form_a.assign.data:
+            resp.members.append(teacher)
+            db.session.add(resp)
+            db.session.commit()
+            flash('Member assigned.')
+        elif form_a.remove.data:
+            resp.members.remove(teacher)
+            db.session.add(resp)
+            db.session.commit()
+            flash('Member removed.')
         return redirect(url_for('main.responsibility_view', rid=resp.id))
 
     form_c = ChangeResponsibilityForm(obj=resp)
@@ -134,6 +164,9 @@ def responsibility_view(rid):
             flash('Updates applied.')
             return redirect(url_for('main.responsibility_view', rid=resp.id))
         elif form_c.delete.data:
+            for member in resp.members:
+                resp.members.remove(member)
+            db.session.commit()
             db.session.delete(resp)
             db.session.commit()
             flash('Responsibility removed from database.')

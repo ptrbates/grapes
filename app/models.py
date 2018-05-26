@@ -54,8 +54,7 @@ def load_user(id):
 
 responsibilities = db.Table('responsibilities',
                             db.Column('teacher_id', db.Integer, db.ForeignKey('teacher.id'), primary_key=True),
-                            db.Column('resp_id', db.Integer, db.ForeignKey('responsibility.id'), primary_key=True),
-                            db.UniqueConstraint('teacher_id', 'resp_id', name='UC_teacher_id_post_id')
+                            db.Column('resp_id', db.Integer, db.ForeignKey('responsibility.id'), primary_key=True)
                             )
 
 

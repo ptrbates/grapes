@@ -42,7 +42,7 @@ class ChangeTeacherForm(FlaskForm):
     grades = BooleanField('Teaches in the grades?')
     hs = BooleanField('Teacher in the high school?')
     change = SubmitField('Make Changes')
-    #delete = SubmitField('Delete Teacher')
+    delete = SubmitField('Delete Teacher')
 
 
 class ChangeCourseForm(FlaskForm):
@@ -68,22 +68,25 @@ class ChangeResponsibilityForm(FlaskForm):
     hours_per_month = FloatField('Hours per Month', validators=[DataRequired()])
     months_per_year = FloatField('Months per Year', validators=[DataRequired()])
     change = SubmitField('Update Responsibility')
-    #delete = SubmitField('Delete Responsibility')
+    delete = SubmitField('Delete Responsibility')
 
 
 class AssignCourseForm(FlaskForm):
-    course_id = SelectField('Assign a new course:', coerce=int)
+    course_id = SelectField('Assign Courses:', coerce=int)
     assign = SubmitField('Assign Course')
+    remove = SubmitField('Remove Course')
 
 
 class AssignResponsibilityForm(FlaskForm):
-    resp_id = SelectField('Assign a new responsibility:')
-    submit = SubmitField('Assign Responsibility')
+    resp_id = SelectField('Assign Responsibilities:', coerce=int)
+    assign = SubmitField('Assign Responsibility')
+    remove = SubmitField('Remove Responsibility')
 
 
 class AssignMemberForm(FlaskForm):
-    teacher_id = SelectField('Assign Teacher:', coerce=int)
+    teacher_id = SelectField('Choose Teacher:', coerce=int)
     assign = SubmitField('Assign Teacher')
+    remove = SubmitField('Remove Teacher')
 
 
 class ChooseViewForm(FlaskForm):
