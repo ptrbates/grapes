@@ -95,6 +95,8 @@ class ChooseViewForm(FlaskForm):
     view_grades = SubmitField('View Grades Only')
 
 
+# todo Figure out how to allow multiplier updating within the app
+
 class ChangeMultipliersForm(FlaskForm):
     grades_ML = FloatField('Grades ML', default=multipliers['Grades Main Lesson'])
     weekspyear = IntegerField('Weeks/year', default=multipliers['weeks/year'])

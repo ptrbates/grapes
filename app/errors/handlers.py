@@ -3,6 +3,8 @@ from app import db
 from app.errors import bp
 
 
+# todo Figure out what's happening with the email: maybe the server isn't configured correctly?
+
 @bp.app_errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404

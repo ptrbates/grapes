@@ -9,6 +9,7 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
 
+# todo Expand tests to include dropping responsibilities, courses, teachers
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):

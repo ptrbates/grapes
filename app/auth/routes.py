@@ -7,7 +7,6 @@ from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm
 from app.models import User
 from app.auth.email import send_password_reset_email
 
-
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -31,6 +30,8 @@ def logout():
     logout_user()
     return redirect(url_for('main.index'))
 
+
+# todo Find a way to verify/approve users before registration
 
 """
 @bp.route('/register', methods=['GET', 'POST'])
