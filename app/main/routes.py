@@ -91,8 +91,9 @@ def teacher_view(tid):
             flash('Responsibility removed.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
-    return render_template('teacher_view.html', teacher=teacher, courses=teacher.courses,
-                           resps=teacher.responsibilities, title=title, form_a=form_a, form_c=form_c, form_r=form_r)
+    return render_template('teacher_view.html', teacher=teacher, courses=teacher.courses.order_by('title'),
+                           resps=teacher.responsibilities.order_by('name'), title=title,
+                           form_a=form_a, form_c=form_c, form_r=form_r)
 
 
 @bp.route('/course_list', methods=['GET', 'POST'])
