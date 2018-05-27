@@ -6,9 +6,12 @@
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <tr>
-        <td>{{ form.view_all() }}</td>
-        <td>{{ form.view_hs() }}</td>
-        <td>{{ form.view_grades() }}</td>
+        <td>{{ form.view_all(style="width: 250px;") }}</td>
+        <td>{{ form.view_hs(style="width: 250px;") }}</td>
+        <td>{{ form.view_ft(style="width: 250px;") }}</td><br>
+        <td>{{ form.view_hum(style="width: 250px;") }}</td>
+        <td>{{ form.view_grades(style="width: 250px;") }}</td>
+        <td>{{ form.view_pt(style="width: 250px;") }}</td>
     </tr>
 </form>
 <br>

@@ -37,7 +37,7 @@ class AddResponsibilityForm(FlaskForm):
 
 
 class ChangeTeacherForm(FlaskForm):
-    first_name = StringField('First name', validators=[DataRequired()])
+    first_name = StringField('First name')
     last_name = StringField('Last name', validators=[DataRequired()])
     grades = BooleanField('Teaches in the grades?')
     hs = BooleanField('Teacher in the high school?')
@@ -90,9 +90,12 @@ class AssignMemberForm(FlaskForm):
 
 
 class ChooseViewForm(FlaskForm):
-    view_all = SubmitField('View All')
     view_hs = SubmitField('View HS Only')
     view_grades = SubmitField('View Grades Only')
+    view_ft = SubmitField('View FT Only')
+    view_pt = SubmitField('View PT Only')
+    view_hum = SubmitField('View Humanities Department')
+    view_all = SubmitField('View All')
 
 
 class ChangeMultipliersForm(FlaskForm):

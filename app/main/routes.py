@@ -15,6 +15,8 @@ def index():
     return render_template('index.html', title='Home')
 
 
+# todo add view of humanities department alone
+
 @bp.route('/teacher_list', methods=['GET', 'POST'])
 @login_required
 def teacher_list():
@@ -24,15 +26,33 @@ def teacher_list():
     if form.validate_on_submit():
         if form.view_hs.data:
             teachers = Teacher.query.filter_by(hs=True).order_by('last_name').all()
+            teachers = [teacher for teacher in teachers if teacher.total_load_p() > 75]
             title = 'High School Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_grades.data:
             teachers = Teacher.query.filter_by(grades=True).order_by('last_name').all()
+            teachers = [teacher for teacher in teachers if teacher.total_load_p() > 75]
             title = 'Grades Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
-        else:
+        elif form.view_ft.data:
             teachers = Teacher.query.order_by('last_name').all()
-            title = 'Load Summary'
+            teachers = [teacher for teacher in teachers if teacher.total_load_p() > 75]
+            title = 'FT Load Summary'
+            return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
+        elif form.view_pt.data:
+            teachers = Teacher.query.order_by('last_name').all()
+            teachers = [teacher for teacher in teachers if teacher.total_load_p() < 75]
+            title = 'PT Load Summary'
+            return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
+        elif form.view_hum.data:
+            teachers = Teacher.query.order_by('last_name').all()
+            hum_dep = ['Zinn', 'Blanchard', 'Fretz', 'Humanities']
+            teachers = [teacher for teacher in teachers if teacher.last_name in hum_dep]
+            title = 'Humanities Department Load Summary'
+            return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
+        elif form.view_all.data:
+            teachers = Teacher.query.order_by('last_name').all()
+            title = 'Teacher Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
 
     return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
@@ -95,6 +115,8 @@ def teacher_view(tid):
                            resps=teacher.responsibilities.order_by('name'), title=title,
                            form_a=form_a, form_c=form_c, form_r=form_r)
 
+
+# todo add views separated by grade
 
 @bp.route('/course_list', methods=['GET', 'POST'])
 @login_required
@@ -236,6 +258,8 @@ def change_multipliers():
 
     return render_template('change_multipliers.html', title=title, form=form)
 
+
+# todo find a way to incorporate multipliers into the database so that they can be modified
 
 multipliers = {'Grades Main Lesson': 20 / 20,
                'weeks/year': 35,

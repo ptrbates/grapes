@@ -88,6 +88,8 @@ class Teacher(db.Model):
         return int(100 * self.total_load() / (multipliers['FT Expectation']))
 
 
+# todo adjust model to make more than one instructor possible
+
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), index=True, unique=True)
