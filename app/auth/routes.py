@@ -7,7 +7,6 @@ from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm
 from app.models import User
 from app.auth.email import send_password_reset_email
 
-
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -32,9 +31,12 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+# todo Find a way to verify/approve users before registration
+
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     return render_template('auth/register.html', title='No New Registration')
+
 
 '''
 def register():
@@ -50,6 +52,7 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 '''
+
 
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
