@@ -33,8 +33,12 @@ def logout():
 
 # todo Find a way to verify/approve users before registration
 
-"""
 @bp.route('/register', methods=['GET', 'POST'])
+def register():
+    return render_template('auth/register.html', title='No New Registration')
+
+
+'''
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -47,7 +51,8 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
-"""
+'''
+
 
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
