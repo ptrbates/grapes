@@ -15,8 +15,6 @@ def index():
     return render_template('index.html', title='Home')
 
 
-# todo add view of humanities department alone
-
 @bp.route('/teacher_list', methods=['GET', 'POST'])
 @login_required
 def teacher_list():
