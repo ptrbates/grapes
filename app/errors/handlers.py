@@ -3,7 +3,7 @@ from app import db
 from app.errors import bp
 
 
-# todo Figure out what's happening with the email: maybe the server isn't configured correctly?
+# todo figure out what's wrong with the email configuration
 
 @bp.app_errorhandler(404)
 def not_found_error(error):
