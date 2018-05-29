@@ -116,8 +116,6 @@ def teacher_view(tid):
                            form_a=form_a, form_c=form_c, form_r=form_r)
 
 
-# todo add views separated by grade, subject
-
 @bp.route('/course_list', methods=['GET', 'POST'])
 @login_required
 def course_list():
