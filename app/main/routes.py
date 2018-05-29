@@ -279,6 +279,3 @@ def change_multipliers():
 
     return render_template('change_multipliers.html', title=title, form=form)
 
-
-# todo add current multipliers to page (approved as of...)
-
