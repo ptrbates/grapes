@@ -88,6 +88,11 @@ class AssignMemberForm(FlaskForm):
     remove = SubmitField('Remove Teacher')
 
 
+class SearchCourseForm(FlaskForm):
+    string_box = StringField('Search for...')
+    submit = SubmitField('Search')
+
+
 class ChooseViewForm(FlaskForm):
     view_hs = SubmitField('View HS Only')
     view_grades = SubmitField('View Grades Only')

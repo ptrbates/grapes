@@ -3,10 +3,11 @@ from flask_login import login_required
 from app import db
 from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
     AssignCourseForm, AssignResponsibilityForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
-    ChangeMultipliersForm, ChooseViewForm
+    ChangeMultipliersForm, ChooseViewForm, SearchCourseForm
 from app.models import Teacher, Course, Responsibility, multipliers
 from app.main import bp
 import json
+
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
@@ -115,14 +116,20 @@ def teacher_view(tid):
                            form_a=form_a, form_c=form_c, form_r=form_r)
 
 
-# todo add views separated by grade
+# todo add views separated by grade, subject
 
 @bp.route('/course_list', methods=['GET', 'POST'])
 @login_required
 def course_list():
+    form = SearchCourseForm()
     courses = Course.query.order_by('title').all()
 
-    return render_template('course_list.html', title='Course List', courses=courses)
+    if form.validate_on_submit():
+        s = form.string_box.data
+        courses = Course.query.filter(Course.title.like('%'+ s + '%')).all()
+        return render_template('course_list.html', title='Course List', courses=courses, form=form)
+
+    return render_template('course_list.html', title='Course List', courses=courses, form=form)
 
 
 @bp.route('/course_view/<cid>', methods=['GET', 'POST'])

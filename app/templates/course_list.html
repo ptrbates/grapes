@@ -3,6 +3,14 @@
 
 {% block app_content %}
 <h1>{{ title }}</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <tr>
+        <td>{{ form.string_box() }}</td>
+        <td>{{ form.submit() }}</td>
+    </tr>
+</form>
+<br>
 <table style="width:100%">
     <tr>
         <th>Course Title</th>
