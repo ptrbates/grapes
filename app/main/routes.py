@@ -217,27 +217,37 @@ def adds():
 
     r_form = AddResponsibilityForm()
     if r_form.validate_on_submit():
-        resp = Responsibility(name=r_form.name.data, hours_per_month=r_form.hours_per_month.data,
-                              months_per_year=r_form.months_per_year.data)
-        db.session.add(resp)
-        db.session.commit()
-        flash('{} added to responsibilities list.'.format(resp.name))
-        return redirect(url_for('main.adds'))
+        if Responsibility.query.filter(Responsibility.name == r_form.name.data).first():
+            flash('{} already exists'.format(r_form.name.data))
+            return redirect(url_for('main.responsibility_view',
+                                    rid=Responsibility.query.filter(Responsibility.name == r_form.name.data).first().id))
+        else:
+            resp = Responsibility(name=r_form.name.data, hours_per_month=r_form.hours_per_month.data,
+                                  months_per_year=r_form.months_per_year.data)
+            db.session.add(resp)
+            db.session.commit()
+            flash('{} added to responsibilities list.'.format(resp.name))
+            return redirect(url_for('main.adds'))
 
     c_form = AddCourseForm()
     c_form.teacher_id.choices = [(0, "---")] + [(t.id, t.last_name + ", " + t.first_name)
                                                 for t in Teacher.query.order_by('last_name')]
     if c_form.validate_on_submit():
-        if c_form.teacher_id.data != '':
-            course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
-                            min_per_week=c_form.min_per_week.data, teacher_id=c_form.teacher_id.data)
+        if Course.query.filter(Course.title == c_form.title.data).first():
+            flash('{} already exists'.format(c_form.title.data))
+            return redirect(url_for('main.course_view',
+                                    cid=Course.query.filter(Course.title == c_form.title.data).first().id))
         else:
-            course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
-                            min_per_week=c_form.min_per_week.data)
-        db.session.add(course)
-        db.session.commit()
-        flash('{} added to course list.'.format(course.title))
-        return redirect(url_for('main.adds'))
+            if c_form.teacher_id.data != '':
+                course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
+                                min_per_week=c_form.min_per_week.data, teacher_id=c_form.teacher_id.data)
+            else:
+                course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
+                                min_per_week=c_form.min_per_week.data)
+            db.session.add(course)
+            db.session.commit()
+            flash('{} added to course list.'.format(course.title))
+            return redirect(url_for('main.adds'))
 
     return render_template('adds.html', title=title, t_form=t_form, r_form=r_form, c_form=c_form)
 
