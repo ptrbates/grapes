@@ -98,15 +98,15 @@ class ChooseViewForm(FlaskForm):
 
 
 class ChangeMultipliersForm(FlaskForm):
-    grades_ML = FloatField('Grades Main Lesson')
     weeks_year = IntegerField('Weeks per year')
     ft_exp = IntegerField('FT Expectation')
-    recess = FloatField('Recess/Lunch')
-    arts_movement = FloatField('Arts/Movement')
-    fl = FloatField('Foreign Language')
-    stem = FloatField('STEM')
     hum_chem = FloatField('Humanities/Chemistry')
+    stem = FloatField('STEM')
+    fl = FloatField('Foreign Language')
+    arts_movement = FloatField('Arts/Movement')
+    grades_ML = FloatField('Grades Main Lesson')
     grades_spec = FloatField('Grades Specialty')
+    recess = FloatField('Recess/Lunch')
     other = FloatField('Other')
     submit = SubmitField('Submit Changes')
 
