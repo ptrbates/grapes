@@ -104,8 +104,9 @@ def teacher_view(tid):
             db.session.commit()
             flash('Responsibility assigned.')
         elif form_r.remove.data:
-            resp.members.remove(teacher)
-            db.session.commit()
+            if teacher in resp.members:
+                resp.members.remove(teacher)
+                db.session.commit()
             flash('Responsibility removed.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
