@@ -4,17 +4,10 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import db, login
+import json
 
-multipliers = {'Grades Main Lesson': 1.00,
-               'weeks/year': 35,
-               'FT Expectation': 39000,
-               'Recess/Lunch': 1.00,
-               'Arts/Movement': 1.00,
-               'Foreign Language': 1.05,
-               'STEM': 1.11,
-               'Humanities/Chemistry': 1.25,
-               'Grades Specialty': 1.00,
-               'Other': 1.00}
+with open('app/multipliers.json', 'r') as file:
+    multipliers = json.load(file)
 
 
 class User(UserMixin, db.Model):

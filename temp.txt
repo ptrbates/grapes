@@ -1,0 +1,33 @@
+        multipliers['Grades Main Lesson'] = form.grades_ML.data
+        multipliers['weeks/year'] = form.weeks_year.data
+        multipliers['FT Expectation'] = form.ft_exp.data
+        multipliers['Recess/Lunch'] = form.recess.data
+        multipliers['Arts/Movement'] = form.arts_movement.data
+        multipliers['Foreign Language'] = form.fl.data
+        multipliers['STEM'] = form.stem.data
+        multipliers['Humanities/Chemistry'] = form.hum_chem.data
+        multipliers['Grades Specialty'] = form.grades_spec.data
+        multipliers['Other'] = form.other.data
+
+    form.grades_ML.data = multipliers['Grades Main Lesson']
+    form.weeks_year.data = multipliers['weeks/year']
+    form.ft_exp.data = multipliers['FT Expectation']
+    form.recess.data = multipliers['Recess/Lunch']
+    form.arts_movement.data = multipliers['Arts/Movement']
+    form.fl.data = multipliers['Foreign Language']
+    form.stem.data = multipliers['STEM']
+    form.hum_chem.data = multipliers['Humanities/Chemistry']
+    form.grades_spec.data = multipliers['Grades Specialty']
+    form.other.data = multipliers['Other']
+
+
+        multipliers['grades_ML'] = form.grades_ML.data
+        multipliers['weeks_year'] = form.weeks_year.data
+        multipliers['ft_exp'] = form.ft_exp.data
+        multipliers['recess'] = form.recess.data
+        multipliers['arts_movement'] = form.arts_movement.data
+        multipliers['fl'] = form.fl.data
+        multipliers['stem'] = form.stem.data
+        multipliers['hum_chem'] = form.hum_chem.data
+        multipliers['grades_spec'] = form.grades_spec.data
+        multipliers['other'] = form.other.data

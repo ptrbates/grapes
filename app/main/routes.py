@@ -4,9 +4,9 @@ from app import db
 from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
     AssignCourseForm, AssignResponsibilityForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
     ChangeMultipliersForm, ChooseViewForm
-from app.models import Teacher, Course, Responsibility
+from app.models import Teacher, Course, Responsibility, multipliers
 from app.main import bp
-
+import json
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
@@ -239,33 +239,45 @@ def adds():
 @bp.route('/multipliers', methods=['GET', 'POST'])
 @login_required
 def change_multipliers():
-    form = ChangeMultipliersForm()
+    class MyDict(dict):
+        pass
+
+    mult = MyDict(multipliers)
+    mult.grades_ML = mult['Grades Main Lesson']
+    mult.weeks_year = mult['weeks/year']
+    mult.ft_exp = mult['FT Expectation']
+    mult.recess = mult['Recess/Lunch']
+    mult.arts_movement = mult['Arts/Movement']
+    mult.fl = mult['Foreign Language']
+    mult.stem = mult['STEM']
+    mult.hum_chem = mult['Humanities/Chemistry']
+    mult.grades_spec = mult['Grades Specialty']
+    mult.other = mult['Other']
+
+    form = ChangeMultipliersForm(obj=mult)
     title = 'Change Multipliers'
     if form.validate_on_submit():
+
         multipliers['Grades Main Lesson'] = form.grades_ML.data
-        multipliers['weeks/year'] = form.weekspyear.data
+        multipliers['weeks/year'] = form.weeks_year.data
         multipliers['FT Expectation'] = form.ft_exp.data
         multipliers['Recess/Lunch'] = form.recess.data
         multipliers['Arts/Movement'] = form.arts_movement.data
         multipliers['Foreign Language'] = form.fl.data
         multipliers['STEM'] = form.stem.data
-        multipliers['Humanities/Chemistry'] = form.humchem.data
-        multipliers['Grades Specialty'] = form.humchem.data
+        multipliers['Humanities/Chemistry'] = form.hum_chem.data
+        multipliers['Grades Specialty'] = form.grades_spec.data
         multipliers['Other'] = form.other.data
+
+        print(mult)
+        with open('app/multipliers.json', 'w') as file:
+            json.dump(multipliers, file)
+
         flash('Multipliers updated successfully.')
+        return redirect(url_for('main.change_multipliers'))
 
     return render_template('change_multipliers.html', title=title, form=form)
 
 
-# todo find a way to incorporate multipliers into the database so that they can be modified
+# todo add current multipliers to page (approved as of...)
 
-multipliers = {'Grades Main Lesson': 20 / 20,
-               'weeks/year': 35,
-               'FT Expectation': 39000,
-               'Recess/Lunch': 20 / 20,
-               'Arts/Movement': 20 / 20,
-               'Foreign Language': 20 / 19,
-               'STEM': 20 / 18,
-               'Humanities/Chemistry': 20 / 16,
-               'Grades Specialty': 20 / 20,
-               'Other': 1}
