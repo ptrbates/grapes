@@ -1,7 +1,7 @@
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
-    width: 100%;
+    width: 80%;
 }
 
 td, th {
@@ -14,13 +14,27 @@ tr:nth-child(even) {
     background-color: #dddddd;
 }
 
-button {
-    background-color: #4CAF50; /* Green */
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
+#wrap {
+    width: 100%;
+    margin: 0 auto;
+    display: table;
+}
+
+#left_col {
+   float:left;
+   width:50%;
+}
+
+#right_col {
+   float:right;
+   width:50%;
+}
+
+@media only screen and (max-width: 480px){
+    #left_col {
+       width:100%;
+    }
+    #right_col {
+       width:100%;
+    }
 }

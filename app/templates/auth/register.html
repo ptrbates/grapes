@@ -2,6 +2,27 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-<h1>{{ title }}</h1>
-<p>No new registration is allowed at this time.</p>
+<div class="row" id="wrap">
+    <div class="col-sm" id="right_col">
+        <h3>{{ title }}</h3>
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+    <div class="col-sm" id="left_col">
+        <h3>Registered Users</h3>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td><a href="{{ url_for('auth.user_view', uid=user.id) }}">{{ user.username }}</a></td>
+                <td>{{ user.email }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 {% endblock %}

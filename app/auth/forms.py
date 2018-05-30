@@ -29,6 +29,13 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 
+class ChangeUserForm(FlaskForm):
+    username = StringField('Username')
+    email = StringField('Email')
+    change = SubmitField('Make Changes')
+    delete = SubmitField('Delete User')
+
+
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')

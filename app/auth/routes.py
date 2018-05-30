@@ -3,9 +3,11 @@ from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
+from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, ChangeUserForm
 from app.models import User
 from app.auth.email import send_password_reset_email
+from flask_login import login_required
+
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -31,27 +33,53 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-# todo Find a way to verify/approve users before registration
-
 @bp.route('/register', methods=['GET', 'POST'])
+@login_required
 def register():
-    return render_template('auth/register.html', title='No New Registration')
-
-
-'''
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
     form = RegistrationForm()
+    title = 'Register New User'
+    users = User.query.all()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
+        user = User()
+        form.populate_obj(user)
+        if user in User.query.all():
+            flash('User {} already exists.'.format(user.username))
+            return redirect(url_for('auth.register'))
+        else:
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('User {} added to database.'.format(user.username))
+            return redirect(url_for('auth.register'))
+    return render_template('auth/register.html', title=title, form=form, users=users)
+
+
+@bp.route('/user_view/<uid>', methods=['GET', 'POST'])
+@login_required
+def user_view(uid):
+    user = User.query.filter_by(id=uid).first()
+    title = 'User View: {}'.format(user.username)
+
+    form = ChangeUserForm(obj=user)
+    if form.change.data:
+        user.username = form.username.data
+        user.email = form.email.data
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', title='Register', form=form)
-'''
+        flash('User {} updated successfully'.format(user.username))
+        return redirect(url_for('auth.user_view', uid=user.id))
+    if form.delete.data:
+        if user.id == current_user.id:
+            flash('{} is currently logged in; cannot delete at this time.'.format(user.username))
+            return redirect(url_for('auth.user_view', uid=user.id))
+        else:
+            db.session.delete(user)
+            db.session.commit()
+            flash('User {} removed from database'.format(user.username))
+            return redirect(url_for('auth.register'))
+
+    return render_template('auth/user_view.html', title=title, user=user, form=form)
+
 
 
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
