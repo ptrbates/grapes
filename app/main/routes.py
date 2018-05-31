@@ -285,7 +285,6 @@ def change_multipliers():
         multipliers['Grades Specialty'] = form.grades_spec.data
         multipliers['Other'] = form.other.data
 
-        print(mult)
         with open('app/multipliers.json', 'w') as file:
             json.dump(multipliers, file)
 
