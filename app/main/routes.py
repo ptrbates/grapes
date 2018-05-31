@@ -25,22 +25,22 @@ def teacher_list():
     if form.validate_on_submit():
         if form.view_hs.data:
             teachers = Teacher.query.filter_by(hs=True).order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.total_load_p() > 75]
+            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() > 75]
             title = 'High School Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_grades.data:
             teachers = Teacher.query.filter_by(grades=True).order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.total_load_p() > 75]
+            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() > 75]
             title = 'Grades Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_ft.data:
             teachers = Teacher.query.order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.total_load_p() > 75]
+            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() > 75]
             title = 'FT Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_pt.data:
             teachers = Teacher.query.order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.total_load_p() < 75]
+            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() < 75]
             title = 'PT Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_hum.data:
