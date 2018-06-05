@@ -3,7 +3,7 @@ from flask import current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
-from app import db, login
+from . import db, login
 import json
 
 with open('app/multipliers.json', 'r') as file:
@@ -95,8 +95,10 @@ class Course(db.Model):
         return '<Course {}>'.format(self.title)
 
     def total_time(self):
-        return int(self.weeks * self.min_per_week * multipliers[self.type])
-
+        if self.weeks and self.min_per_week:
+            return int(self.weeks * self.min_per_week * multipliers[self.type])
+        else:
+            return 0
 
 class Responsibility(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,4 +113,7 @@ class Responsibility(db.Model):
         return '<Responsibility {}>'.format(self.name)
 
     def total_time(self):
-        return 60 * self.hours_per_month * self.months_per_year * multipliers['Other']
+        if self.hours_per_month and self.months_per_year:
+            return 60 * self.hours_per_month * self.months_per_year * multipliers['Other']
+        else:
+            return 0

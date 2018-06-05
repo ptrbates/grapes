@@ -19,3 +19,6 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['grapes.pws@gmail.com']
     LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
+    THREADS_PER_PAGE = 2
+    CSRF_ENABLED = True
+

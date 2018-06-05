@@ -1,11 +1,11 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required
-from app import db
-from app.main.forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
+from .. import db
+from .forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
     AssignCourseForm, AssignResponsibilityForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
     ChangeMultipliersForm, ChooseViewForm, SearchCourseForm
-from app.models import Teacher, Course, Responsibility, multipliers
-from app.main import bp
+from ..models import Teacher, Course, Responsibility, multipliers
+from . import bp
 import json
 
 
@@ -20,7 +20,11 @@ def index():
 @login_required
 def teacher_list():
     title = 'Teacher Load Summary'
-    teachers = Teacher.query.order_by('last_name').all()
+    if Teacher.query.first():
+        teachers = Teacher.query.order_by('last_name').all()
+    else:
+        flash('No teachers have been added yet.')
+        return redirect(url_for('main.adds'))
     form = ChooseViewForm()
     if form.validate_on_submit():
         if form.view_hs.data:
@@ -119,15 +123,23 @@ def teacher_view(tid):
 @bp.route('/course_list', methods=['GET', 'POST'])
 @login_required
 def course_list():
-    form = SearchCourseForm()
-    courses = Course.query.order_by('title').all()
+    title = 'Course List'
+    if Course.query.first():
+        courses = Course.query.order_by('title').all()
+    else:
+        flash('No courses have been added yet.')
+        return redirect(url_for('main.adds'))
 
+    form = SearchCourseForm()
     if form.validate_on_submit():
-        s = form.string_box.data
-        courses = Course.query.filter(Course.title.like('%'+ s + '%')).all()
+        s = form.string_box.data.split()
+        courses = []
+        for i in s:
+            courses.append(Course.query.filter(Course.title.like('%'+ i + '%')).all())
+        courses = [course for sublist in courses for course in sublist]
         return render_template('course_list.html', title='Course List', courses=courses, form=form)
 
-    return render_template('course_list.html', title='Course List', courses=courses, form=form)
+    return render_template('course_list.html', title=title, courses=courses, form=form)
 
 
 @bp.route('/course_view/<cid>', methods=['GET', 'POST'])
@@ -145,6 +157,8 @@ def course_view(cid):
             flash('Updates applied.')
             return redirect(url_for('main.course_view', cid=course.id))
         elif form.delete.data:
+            form.populate_obj(course)
+            course.teacher_id = 0
             db.session.delete(course)
             db.session.commit()
             flash('Course removed from database.')
@@ -156,9 +170,14 @@ def course_view(cid):
 @bp.route('/responsibility_list', methods=['GET', 'POST'])
 @login_required
 def responsibility_list():
-    resps = Responsibility.query.order_by('name').all()
+    title = 'Responsibility List'
+    if Responsibility.query.first():
+        resps = Responsibility.query.order_by('name').all()
+    else:
+        flash('No responsibilities have been added yet.')
+        return redirect(url_for('main.adds'))
 
-    return render_template('responsibility_list.html', title='Responsibility List', resps=resps)
+    return render_template('responsibility_list.html', title=title, resps=resps)
 
 
 @bp.route('/responsibility_view/<rid>', methods=['GET', 'POST'])
@@ -230,8 +249,11 @@ def adds():
             return redirect(url_for('main.adds'))
 
     c_form = AddCourseForm()
-    c_form.teacher_id.choices = [(0, "---")] + [(t.id, t.last_name + ", " + t.first_name)
-                                                for t in Teacher.query.order_by('last_name')]
+    try:
+        c_form.teacher_id.choices = [(0, "---")] + [(t.id, t.last_name + ", " + t.first_name)
+                                                    for t in Teacher.query.order_by('last_name')]
+    except:
+        c_form.teacher_id.choices = []
     if c_form.validate_on_submit():
         if Course.query.filter(Course.title == c_form.title.data).first():
             flash('{} already exists'.format(c_form.title.data))
