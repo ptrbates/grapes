@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <td><a href="{{ url_for('main.course_view', cid=course.id) }}">{{ course.title }}</a></td>
-        {% if course.teachers %}
+        {% if course.teachers.all() | length > 0 %}
         <td>
             {% for teacher in course.teachers %}
             <a href="{{ url_for('main.teacher_view', tid=teacher.id) }}">
@@ -31,11 +31,21 @@
     </tr>
 </table>
 <br>
-    <h3>Update Course:</h3>
+<div class="container">
     <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+        <div class="col-sm">
+            <div class="col-md-4">
+                <h3>Update Course:</h3>
+                {{ wtf.quick_form(form_c) }}
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="col-md-4">
+                <h3>Assign Teacher:</h3>
+                {{ wtf.quick_form(form_a) }}
+            </div>
         </div>
     </div>
+</div>
 <br>
 {% endblock %}

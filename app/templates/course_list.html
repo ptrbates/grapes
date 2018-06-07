@@ -23,7 +23,7 @@
     {% for course in courses %}
     <tr>
         <td><a href="{{ url_for('main.course_view', cid=course.id) }}">{{ course.title }}</a></td>
-        {% if course.teacher_id %}
+        {% if course.teachers.all() | length > 0 %}
         <td>
             {% for teacher in course.teachers %}
             <a href="{{ url_for('main.teacher_view', tid=teacher.id) }}">

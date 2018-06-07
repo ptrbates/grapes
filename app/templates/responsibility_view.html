@@ -13,10 +13,14 @@
     </tr>
     <tr>
         <td><a href="{{ url_for('main.responsibility_view', rid=resp.id) }}">{{ resp.name }}</a></td>
+        {% if resp.members.all() | length > 0 %}
         <td>{% for member in resp.members %}
             <a href="{{ url_for('main.teacher_view', tid=member.id) }}">{{ member.last_name }}, {{ member.first_name }}</a><br>
             {% endfor %}
         </td>
+        {% else %}
+        <td><a href="{{ url_for('main.responsibility_view', rid=resp.id) }}">Assign members</a> </td>
+        {% endif %}
         <td>{{ resp.hours_per_month }}</td>
         <td>{{ resp.months_per_year }}</td>
         <td>{{ resp.total_time() }}</td>

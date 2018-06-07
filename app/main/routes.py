@@ -4,17 +4,18 @@ import json
 
 from .. import db
 from ..models import Teacher, Course, Responsibility, multipliers
-from .forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
+from .forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm, AssignTeacherForm,  \
     AssignCourseForm, AssignResponsibilityForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
     ChangeMultipliersForm, ChooseViewForm, SearchCourseForm
 from . import bp
 from .course_conversion import course_conversion
 
 
+'''
 @bp.before_app_first_request
 def update_schema():
     course_conversion()
-
+'''
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
@@ -35,29 +36,36 @@ def teacher_list():
     form = ChooseViewForm()
     if form.validate_on_submit():
         if form.view_hs.data:
-            teachers = Teacher.query.filter_by(hs=True).order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() > 75]
+            teachers = Teacher.query.filter_by(
+                hs=True).order_by('last_name').all()
+            teachers = [
+                teacher for teacher in teachers if teacher.teaching_load_p() > 75]
             title = 'High School Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_grades.data:
-            teachers = Teacher.query.filter_by(grades=True).order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() > 75]
+            teachers = Teacher.query.filter_by(
+                grades=True).order_by('last_name').all()
+            teachers = [
+                teacher for teacher in teachers if teacher.teaching_load_p() > 75]
             title = 'Grades Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_ft.data:
             teachers = Teacher.query.order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() > 75]
+            teachers = [
+                teacher for teacher in teachers if teacher.teaching_load_p() > 75]
             title = 'FT Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_pt.data:
             teachers = Teacher.query.order_by('last_name').all()
-            teachers = [teacher for teacher in teachers if teacher.teaching_load_p() < 75]
+            teachers = [
+                teacher for teacher in teachers if teacher.teaching_load_p() < 75]
             title = 'PT Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_hum.data:
             teachers = Teacher.query.order_by('last_name').all()
             hum_dep = ['Zinn', 'Blanchard', 'Fretz', 'Humanities']
-            teachers = [teacher for teacher in teachers if teacher.last_name in hum_dep]
+            teachers = [
+                teacher for teacher in teachers if teacher.last_name in hum_dep]
             title = 'Humanities Department Load Summary'
             return render_template('teacher_list.html', title=title, teachers=teachers, form=form)
         elif form.view_all.data:
@@ -75,7 +83,8 @@ def teacher_view(tid):
     title = 'Teacher View: {} {}'.format(teacher.first_name, teacher.last_name)
 
     form_a = AssignCourseForm()
-    form_a.course_id.choices = [(c.id, c.title) for c in Course.query.order_by('title')]
+    form_a.course_id.choices = [(c.id, c.title)
+                                for c in Course.query.order_by('title')]
     if form_a.validate_on_submit():
         course_id = form_a.course_id.data
         course = Course.query.filter_by(id=course_id).first()
@@ -111,27 +120,33 @@ def teacher_view(tid):
         return redirect(url_for('main.teacher_list'))
 
     form_r = AssignResponsibilityForm(obj=teacher)
-    form_r.resp_id.choices = [(r.id, r.name) for r in Responsibility.query.order_by('name')]
+    form_r.resp_id.choices = [(r.id, r.name)
+                              for r in Responsibility.query.order_by('name')]
     if form_r.validate_on_submit():
         resp_id = form_r.resp_id.data
         resp = Responsibility.query.filter_by(id=resp_id).first()
         if form_r.assign.data:
-            resp.members.append(teacher)
-            db.session.commit()
-            flash('Responsibility assigned.')
+            if teacher not in resp.members:
+                resp.members.append(teacher)
+                db.session.add(resp)
+                db.session.commit()
+                flash('Responsibility assigned.')
+            else:
+                flash('Teacher already assigned to this responsibility.')
         elif form_r.remove.data:
             if teacher in resp.members:
                 resp.members.remove(teacher)
+                db.session.add(resp)
                 db.session.commit()
             flash('Responsibility removed.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
     return render_template('teacher_view.html',
-        teacher=teacher,
-        courses=teacher.courselist.order_by('title'),
-        resps=teacher.responsibilities.order_by('name'),
-        title=title,
-        form_a=form_a, form_c=form_c, form_r=form_r)
+                           teacher=teacher,
+                           courses=teacher.courselist.order_by('title'),
+                           resps=teacher.responsibilities.order_by('name'),
+                           title=title,
+                           form_a=form_a, form_c=form_c, form_r=form_r)
 
 
 @bp.route('/course_list', methods=['GET', 'POST'])
@@ -149,7 +164,8 @@ def course_list():
         s = form.string_box.data.split()
         courses = []
         for i in s:
-            courses.append(Course.query.filter(Course.title.like('%'+ i + '%')).all())
+            courses.append(Course.query.filter(
+                Course.title.like('%' + i + '%')).all())
         courses = [course for sublist in courses for course in sublist]
         return render_template('course_list.html', title='Course List', courses=courses, form=form)
 
@@ -162,23 +178,51 @@ def course_view(cid):
     course = Course.query.filter_by(id=cid).first()
     title = 'Course View: {}'.format(course.title)
 
-    form = ChangeCourseForm(obj=course)
-    #form.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
-    if form.validate_on_submit():
-        if form.assign.data:
-            form.populate_obj(course)
+    form_c = ChangeCourseForm(obj=course)
+    #form_c.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
+    if form_c.validate_on_submit():
+        if form_c.assign.data:
+            form_c.populate_obj(course)
             db.session.commit()
             flash('Updates applied.')
             return redirect(url_for('main.course_view', cid=course.id))
-        elif form.delete.data:
-            form.populate_obj(course)
+        elif form_c.delete.data:
+            form_c.populate_obj(course)
             course.teacher_id = 0
             db.session.delete(course)
             db.session.commit()
             flash('Course removed from database.')
             return redirect(url_for('main.course_list'))
 
-    return render_template('course_view.html', course=course, title=title, form=form)
+    form_a = AssignTeacherForm(obj=course)
+    form_a.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name)
+                                 for t in Teacher.query.order_by('last_name')]
+    if form_a.validate_on_submit():
+        teacher = Teacher.query.filter_by(id=form_a.teacher_id.data).first()
+        if form_a.assign.data:
+            if teacher not in course.teachers:
+                course.teachers.append(teacher)
+                db.session.add(course)
+                db.session.commit()
+                flash('Teacher assigned.')
+                return redirect(url_for('main.course_view', cid=course.id))
+            else:
+                flash('Teacher already assigned to that course.')
+                return redirect(url_for('main.course_view', cid=course.id))
+        elif form_a.remove.data:
+            if teacher in course.teachers:
+                course.teachers.remove(teacher)
+                db.session.add(course)
+                db.session.commit()
+                flash('Teacher removed from course.')
+                return redirect(url_for('main.course_view', cid=course.id))
+            else:
+                flash("Teacher wasn't assigned to that course.")
+                return redirect(url_for('main.course_view', cid=course.id))
+
+            return redirect(url_for('main.course_list'))
+
+    return render_template('course_view.html', course=course, title=title, form_c=form_c, form_a=form_a)
 
 
 @bp.route('/responsibility_list', methods=['GET', 'POST'])
@@ -201,19 +245,24 @@ def responsibility_view(rid):
     title = 'Responsibility View: {}'.format(resp.name)
 
     form_a = AssignMemberForm()
-    form_a.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
+    form_a.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name)
+                                 for t in Teacher.query.order_by('last_name')]
     if form_a.validate_on_submit():
         teacher = Teacher.query.filter_by(id=form_a.teacher_id.data).first()
         if form_a.assign.data:
-            resp.members.append(teacher)
-            db.session.add(resp)
-            db.session.commit()
-            flash('Member assigned.')
+            if teacher not in resp.members:
+                resp.members.append(teacher)
+                db.session.add(resp)
+                db.session.commit()
+                flash('Responsibility assigned.')
+            else:
+                flash('Teacher already assigned to this responsibility.')
         elif form_a.remove.data:
-            resp.members.remove(teacher)
-            db.session.add(resp)
-            db.session.commit()
-            flash('Member removed.')
+            if teacher in resp.members:
+                resp.members.remove(teacher)
+                db.session.add(resp)
+                db.session.commit()
+                flash('Member removed.')
         return redirect(url_for('main.responsibility_view', rid=resp.id))
 
     form_c = ChangeResponsibilityForm(obj=resp)
@@ -245,7 +294,8 @@ def adds():
                           grades=t_form.grades.data, hs=t_form.hs.data)
         db.session.add(teacher)
         db.session.commit()
-        flash('{} {} added to teacher list.'.format(teacher.first_name, teacher.last_name))
+        flash('{} {} added to teacher list.'.format(
+            teacher.first_name, teacher.last_name))
         return redirect(url_for('main.adds'))
 
     r_form = AddResponsibilityForm()
@@ -328,4 +378,3 @@ def change_multipliers():
         return redirect(url_for('main.change_multipliers'))
 
     return render_template('change_multipliers.html', title=title, form=form)
-
