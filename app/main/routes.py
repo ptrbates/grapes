@@ -179,7 +179,6 @@ def course_view(cid):
     title = 'Course View: {}'.format(course.title)
 
     form_c = ChangeCourseForm(obj=course)
-    #form_c.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
     if form_c.validate_on_submit():
         if form_c.assign.data:
             form_c.populate_obj(course)
@@ -189,6 +188,9 @@ def course_view(cid):
         elif form_c.delete.data:
             form_c.populate_obj(course)
             course.teacher_id = 0
+            for teacher in course.teachers.all():
+                course.teachers.remove(teacher)
+            db.session.commit()
             db.session.delete(course)
             db.session.commit()
             flash('Course removed from database.')
