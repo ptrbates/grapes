@@ -10,10 +10,11 @@ from .forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignM
 from . import bp
 from .course_conversion import course_conversion
 
-
+'''
 @bp.before_app_first_request
 def update_schema():
     course_conversion()
+'''
 
 
 @bp.route('/', methods=['GET', 'POST'])
