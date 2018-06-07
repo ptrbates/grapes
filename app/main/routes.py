@@ -187,7 +187,6 @@ def course_view(cid):
             return redirect(url_for('main.course_view', cid=course.id))
         elif form_c.delete.data:
             form_c.populate_obj(course)
-            course.teacher_id = 0
             for teacher in course.teachers:
                 course.teachers.remove(teacher)
             db.session.commit()
