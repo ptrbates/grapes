@@ -14,9 +14,13 @@
     </tr>
     <tr>
         <td><a href="{{ url_for('main.course_view', cid=course.id) }}">{{ course.title }}</a></td>
-        {% if course.teacher_id %}
-        <td><a href="{{ url_for('main.teacher_view', tid=course.teacher_id) }}">
-            {{ course.teacher.last_name }}, {{ course.teacher.first_name }}</a></td>
+        {% if course.teachers %}
+        <td>
+            {% for teacher in course.teachers %}
+            <a href="{{ url_for('main.teacher_view', tid=teacher.id) }}">
+            {{ teacher.last_name }}, {{ teacher.first_name }}</a><br>
+            {% endfor %}
+        </td>
         {% else %}
         <td><a href="{{ url_for('main.course_view', cid=course.id) }}">Assign instructor</a></td>
         {% endif %}

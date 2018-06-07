@@ -1,12 +1,19 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required
+import json
+
 from .. import db
+from ..models import Teacher, Course, Responsibility, multipliers
 from .forms import AddTeacherForm, AddCourseForm, AddResponsibilityForm, AssignMemberForm,  \
     AssignCourseForm, AssignResponsibilityForm, ChangeCourseForm, ChangeTeacherForm, ChangeResponsibilityForm, \
     ChangeMultipliersForm, ChooseViewForm, SearchCourseForm
-from ..models import Teacher, Course, Responsibility, multipliers
 from . import bp
-import json
+from .course_conversion import course_conversion
+
+
+@bp.before_app_first_request
+def update_schema():
+    course_conversion()
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -73,15 +80,19 @@ def teacher_view(tid):
         course_id = form_a.course_id.data
         course = Course.query.filter_by(id=course_id).first()
         if form_a.assign.data:
-            course.teacher_id = teacher.id
-            db.session.add(teacher)
-            db.session.commit()
-            flash('Course assigned.')
+            if teacher not in course.teachers:
+                course.teachers.append(teacher)
+                db.session.add(teacher)
+                db.session.commit()
+                flash('Course assigned.')
+            else:
+                flash('Teacher already assigned to this course.')
         elif form_a.remove.data:
-            course.teacher_id = None
-            db.session.add(course)
-            db.session.commit()
-            flash('Course removed.')
+            if teacher in course.teachers:
+                course.teachers.remove(teacher)
+                db.session.add(course)
+                db.session.commit()
+                flash('Course removed.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
     form_c = ChangeTeacherForm(obj=teacher)
@@ -115,9 +126,12 @@ def teacher_view(tid):
             flash('Responsibility removed.')
         return redirect(url_for('main.teacher_view', tid=teacher.id))
 
-    return render_template('teacher_view.html', teacher=teacher, courses=teacher.courses.order_by('title'),
-                           resps=teacher.responsibilities.order_by('name'), title=title,
-                           form_a=form_a, form_c=form_c, form_r=form_r)
+    return render_template('teacher_view.html',
+        teacher=teacher,
+        courses=teacher.courselist.order_by('title'),
+        resps=teacher.responsibilities.order_by('name'),
+        title=title,
+        form_a=form_a, form_c=form_c, form_r=form_r)
 
 
 @bp.route('/course_list', methods=['GET', 'POST'])
@@ -149,7 +163,7 @@ def course_view(cid):
     title = 'Course View: {}'.format(course.title)
 
     form = ChangeCourseForm(obj=course)
-    form.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
+    #form.teacher_id.choices = [(t.id, t.last_name + ', ' + t.first_name) for t in Teacher.query.order_by('last_name')]
     if form.validate_on_submit():
         if form.assign.data:
             form.populate_obj(course)

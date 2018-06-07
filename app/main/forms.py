@@ -55,7 +55,7 @@ class ChangeCourseForm(FlaskForm):
                                                ('Grades Specialty', 'Grades Specialty'),
                                                ('Other', 'Other')],
                        validators=[DataRequired()])
-    teacher_id = SelectField('Instructor', coerce=int)
+    # teacher_id = SelectField('Instructor', coerce=int)
     weeks = FloatField('Course Duration (weeks)', validators=[DataRequired()])
     min_per_week = IntegerField('Minutes per week', validators=[DataRequired()])
     assign = SubmitField('Make Changes')
