@@ -324,15 +324,12 @@ def adds():
             return redirect(url_for('main.course_view',
                                     cid=Course.query.filter(Course.title == c_form.title.data).first().id))
         else:
+            course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
+                            min_per_week=c_form.min_per_week.data)
             if c_form.teacher_id.data != '':
                 teacher = Teacher.query.filter_by(
                     id=c_form.teacher_id.data).first()
-                course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
-                                min_per_week=c_form.min_per_week.data)
                 course.teachers.append(teacher)
-            else:
-                course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
-                                min_per_week=c_form.min_per_week.data)
             db.session.add(course)
             db.session.commit()
             flash('{} added to course list.'.format(course.title))
