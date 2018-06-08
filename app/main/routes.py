@@ -325,8 +325,11 @@ def adds():
                                     cid=Course.query.filter(Course.title == c_form.title.data).first().id))
         else:
             if c_form.teacher_id.data != '':
+                teacher = Teacher.query.filter_by(
+                    id=c_form.teacher_id.data).first()
                 course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
-                                min_per_week=c_form.min_per_week.data, teacher_id=c_form.teacher_id.data)
+                                min_per_week=c_form.min_per_week.data)
+                course.teachers.append(teacher)
             else:
                 course = Course(title=c_form.title.data, type=c_form.type.data, weeks=c_form.weeks.data,
                                 min_per_week=c_form.min_per_week.data)
