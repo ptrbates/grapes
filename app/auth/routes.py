@@ -69,7 +69,8 @@ def user_view(uid):
         return redirect(url_for('auth.user_view', uid=user.id))
     if form.delete.data:
         if user.id == current_user.id:
-            flash('{} is currently logged in; cannot delete at this time.'.format(user.username))
+            flash('{} is currently logged in; cannot delete at this time.'.format(
+                user.username))
             return redirect(url_for('auth.user_view', uid=user.id))
         else:
             db.session.delete(user)
@@ -78,7 +79,6 @@ def user_view(uid):
             return redirect(url_for('auth.register'))
 
     return render_template('auth/user_view.html', title=title, user=user, form=form)
-
 
 
 @bp.route('/reset_password_request', methods=['GET', 'POST'])

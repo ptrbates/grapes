@@ -72,7 +72,6 @@ class Teacher(db.Model):
   last_name = db.Column(db.String(64), index=True)
   grades = db.Column(db.Boolean)
   hs = db.Column(db.Boolean)
-  courses = db.relationship('Course', backref='teacher', lazy='dynamic')
   courselist = db.relationship('Course',
                                secondary=instructors,
                                primaryjoin=(instructors.c.teacher_id == id),
@@ -117,7 +116,6 @@ class Course(db.Model):
   type = db.Column(db.String(64))
   weeks = db.Column(db.Float)
   min_per_week = db.Column(db.Integer)
-  teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
   teachers = db.relationship('Teacher', secondary=instructors,
                              primaryjoin=(instructors.c.course_id == id),
                              backref=db.backref('course',
